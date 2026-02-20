@@ -1,4 +1,4 @@
-name: Tests
+name: Build and Pack
 
 on:
   push:
@@ -19,22 +19,15 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: List files
-        run: ls -la
-
-      - name: Find solution
-        run: find . -name "*.sln"
-
       - name: Restore
         run: dotnet restore
 
       - name: Build
         run: dotnet build --no-restore
 
-      - name: Test
-        run: dotnet test --no-build
-        env:
-          VIGILCI_GITHUB_TOKEN: ${{ secrets.VIGILCI_GITHUB_TOKEN }}
-          VIGILCI_GIST_ID: ${{ secrets.VIGILCI_GIST_ID }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-          GITHUB_SHA: ${{ github.sha }}
+      - name: Pack
+        run: dotnet pack -c Release -o ./nupkgs
+
+      - name: Push to NuGet
+        if: github.ref == 'refs/heads/main'
+        run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicat

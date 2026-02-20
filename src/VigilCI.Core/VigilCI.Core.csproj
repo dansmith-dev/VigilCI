@@ -4,6 +4,18 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <PackageId>VigilCI.Core</PackageId>
+        <Version>0.1.0</Version>
+        <Authors>Dan</Authors>
+        <Description>Core library for VigilCI — continuous performance test tracking</Description>
+        <PackageTags>performance;testing;benchmarking;ci</PackageTags>
+        <PackageProjectUrl>https://github.com/yourusername/vigilci</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/yourusername/vigilci</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>

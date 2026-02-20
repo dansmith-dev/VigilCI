@@ -1,12 +1,8 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VigilCI.Core", "src\VigilCI.Core\VigilCI.Core.csproj", "{484952EB-63C5-4AA6-8FAD-0DDB9E0ABD7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VigilCI.Core.Tests", "Tests\VigilCI.Core.Tests\VigilCI.Core.Tests.csproj", "{81D082D0-18B9-48D0-A27D-A68443F47072}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,13 +14,8 @@ Global
 		{484952EB-63C5-4AA6-8FAD-0DDB9E0ABD7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{484952EB-63C5-4AA6-8FAD-0DDB9E0ABD7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{484952EB-63C5-4AA6-8FAD-0DDB9E0ABD7D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{81D082D0-18B9-48D0-A27D-A68443F47072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{81D082D0-18B9-48D0-A27D-A68443F47072}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{81D082D0-18B9-48D0-A27D-A68443F47072}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{81D082D0-18B9-48D0-A27D-A68443F47072}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{484952EB-63C5-4AA6-8FAD-0DDB9E0ABD7D} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
-		{81D082D0-18B9-48D0-A27D-A68443F47072} = {B2C3D4E5-F6A7-8901-BCDE-F12345678901}
 	EndGlobalSection
 EndGlobal
