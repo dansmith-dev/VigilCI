@@ -1,21 +1,20 @@
 name: Build and Pack
 
 on:
-  on:
-    push:
-      branches: [ main ]
-      paths:
-        - 'src/**'
-        - 'tests/**'
-        - '**.sln'
-        - '**.csproj'
-    pull_request:
-      branches: [ main ]
-      paths:
-        - 'src/**'
-        - 'tests/**'
-        - '**.sln'
-        - '**.csproj'
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '**.sln'
+      - '**.csproj'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '**.sln'
+      - '**.csproj'
   workflow_dispatch:
 
 jobs:
