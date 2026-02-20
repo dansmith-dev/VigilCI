@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate version
         id: version
-        run: echo "VERSION=0.1.$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
+        run: echo "VERSION=0.$(date +'%y%m%d').$(date +'%H%M')" >> $GITHUB_OUTPUT
 
       - name: Restore
         run: dotnet restore
