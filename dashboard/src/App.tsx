@@ -6,29 +6,29 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
 
+    function redirectToGitHub() {
+        const client_id = "blah blah";
+        const redirect_uri = "http://localhost:5173/";
+        const scope = "read:user";
+
+
+        const authUrl = `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}`;
+
+
+        window.location.href = authUrl;
+    }
+    
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="login-container">
+          <h1>Login to MyApp</h1>
+          <button className="github-button" onClick={redirectToGitHub}>
+              <img
+                  src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                  alt="GitHub Logo"
+              />
+              Login with GitHub
+          </button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
   )
 }
 
