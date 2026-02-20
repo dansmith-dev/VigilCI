@@ -1,24 +1,47 @@
-steps:
-  - uses: actions/checkout@v4
+name: Build and Pack
 
-  - name: Setup .NET
-    uses: actions/setup-dotnet@v4
-    with:
-      dotnet-version: '8.0.x'
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '**.sln'
+      - '**.csproj'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '**.sln'
+      - '**.csproj'
+  workflow_dispatch:
 
-  - name: Generate version
-    id: version
-    run: echo "VERSION=0.1.$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-  - name: Restore
-    run: dotnet restore
+    steps:
+      - uses: actions/checkout@v4
 
-  - name: Build
-    run: dotnet build --no-restore
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-  - name: Pack
-    run: dotnet pack -c Release -o ./nupkgs /p:Version=${{ steps.version.outputs.VERSION }}
+      - name: Generate version
+        id: version
+        run: echo "VERSION=0.1.$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
 
-  - name: Push to NuGet
-    if: github.ref == 'refs/heads/main'
-    run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Pack
+        run: dotnet pack -c Release -o ./nupkgs /p:Version=${{ steps.version.outputs.VERSION }}
+
+      - name: Push to NuGet
+        if: github.ref == 'refs/heads/main'
+        run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
