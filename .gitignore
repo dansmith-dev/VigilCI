@@ -1,0 +1,24 @@
+# Build outputs
+bin/
+obj/
+
+# IDE
+.idea/
+*.user
+*.suo
+.vs/
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Sensitive local config
+launchSettings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+.dotnet-temp/
+*.sentinel

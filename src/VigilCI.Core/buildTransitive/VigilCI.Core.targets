@@ -1,0 +1,25 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <VigilCI_EnableAutoFramework Condition="'$(VigilCI_EnableAutoFramework)' == ''">true</VigilCI_EnableAutoFramework>
+  </PropertyGroup>
+
+  <Target Name="VigilCI_GenerateTestFrameworkAssemblyAttribute"
+          BeforeTargets="CoreCompile"
+          Condition="'$(VigilCI_EnableAutoFramework)' == 'true'">
+
+    <PropertyGroup>
+      <VigilCI_GeneratedFile>$(IntermediateOutputPath)VigilCi.Generated.cs</VigilCI_GeneratedFile>
+    </PropertyGroup>
+
+    <WriteLinesToFile
+      File="$(VigilCI_GeneratedFile)"
+      Lines="[assembly: Xunit.TestFramework(typeof(VigilCI.Core.VigilCiTestFramework))]"
+      Overwrite="true" Encoding="UTF-8" />
+
+    <ItemGroup>
+      <Compile Include="$(VigilCI_GeneratedFile)" Visible="false" />
+    </ItemGroup>
+  </Target>
+
+</Project>
