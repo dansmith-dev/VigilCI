@@ -9,6 +9,7 @@ public record PerformanceResult(
     string Commit,
     string Branch,
     int Runs,
+    string Repository,
     IReadOnlyList<AveragedSegment> Segments);
 
 public static class PerformanceResultStore
@@ -29,6 +30,7 @@ public static class PerformanceResultStore
             Timestamp: DateTimeOffset.UtcNow,
             Commit: Environment.GetEnvironmentVariable("GITHUB_SHA") ?? "local",
             Branch: Environment.GetEnvironmentVariable("GITHUB_REF_NAME") ?? "local",
+            Repository: Environment.GetEnvironmentVariable("GITHUB_REPOSITORY") ?? "local",
             Runs: runs,
             Segments: context.GetAverages());
 
