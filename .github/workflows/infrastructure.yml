@@ -10,6 +10,7 @@ on:
     paths:
       - "infrastructure/**"
       - ".github/workflows/infra.yml"
+  workflow_dispatch:
 
 jobs:
   terraform:
