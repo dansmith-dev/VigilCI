@@ -17,15 +17,18 @@ resource "cloudflare_workers_script" "this" {
   main_module        = "worker.js"
   compatibility_date = "2025-01-01"
 
-  plain_text_binding {
-    name = "GITHUB_CLIENT_ID"
-    text = var.github_client_id
-  }
-
-  secret_text_binding {
-    name = "GITHUB_CLIENT_SECRET"
-    text = var.github_client_secret
-  }
+  bindings = [
+    {
+      name = "GITHUB_CLIENT_ID"
+      type = "plain_text"
+      text = var.github_client_id
+    },
+    {
+      name = "GITHUB_CLIENT_SECRET"
+      type = "secret_text"
+      text = var.github_client_secret
+    }
+  ]
 }
 
 resource "cloudflare_workers_script_subdomain" "this" {
