@@ -9,17 +9,23 @@ function corsHeaders() {
     };
 }
 
+function getToken(request) {
+    const cookie = request.headers.get("Cookie") ?? "";
+    return cookie.split(";").find(c => c.trim().startsWith("gh_token="))
+        ?.split("=")[1]?.trim() ?? null;
+}
+
 export default {
     async fetch(request, env) {
         const url = new URL(request.url);
 
-        // Handle CORS preflight
         if (request.method === "OPTIONS") {
             return new Response(null, { status: 204, headers: corsHeaders() });
         }
 
-        if (url.pathname === "/exchange") return handleExchange(request, url, env);
-        if (url.pathname === "/logout") return handleLogout(request, url, env);
+        if (url.pathname === "/exchange")  return handleExchange(request, url, env);
+        if (url.pathname === "/session")   return handleSession(request, url, env);
+        if (url.pathname === "/logout")    return handleLogout(request, url, env);
         if (url.pathname.startsWith("/github/")) return handleGitHubProxy(request, url, env);
 
         return new Response("Not found", { status: 404, headers: corsHeaders() });
@@ -28,7 +34,9 @@ export default {
 
 async function handleExchange(request, url, env) {
     const code = url.searchParams.get("code");
-    if (!code) return new Response("Missing code", { status: 400, headers: corsHeaders() });
+    if (!code) {
+        return new Response("Missing code", { status: 400, headers: corsHeaders() });
+    }
 
     const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
         method: "POST",
@@ -47,19 +55,43 @@ async function handleExchange(request, url, env) {
     if (!tokenJson.access_token) {
         return new Response(JSON.stringify(tokenJson), {
             status: 400,
-            headers: { "content-type": "application/json", ...corsHeaders() }
+            headers: { "content-type": "application/json", ...corsHeaders() },
         });
     }
+
+    // Store token briefly in KV, redirect frontend with a one-time code
+    const onetimeCode = crypto.randomUUID();
+    await env.TOKEN_STORE.put(onetimeCode, tokenJson.access_token, { expirationTtl: 60 });
 
     return new Response(null, {
         status: 302,
         headers: {
-            "Location": "http://localhost:5173/VigilCI/",
+            "Location": `${ALLOWED_ORIGIN}/VigilCI/?session=${onetimeCode}`,
+            ...corsHeaders(),
+        },
+    });
+}
+
+async function handleSession(request, url, env) {
+    const code = url.searchParams.get("code");
+    if (!code) {
+        return new Response("Missing code", { status: 400, headers: corsHeaders() });
+    }
+
+    const token = await env.TOKEN_STORE.get(code);
+    if (!token) {
+        return new Response("Invalid or expired code", { status: 400, headers: corsHeaders() });
+    }
+
+    await env.TOKEN_STORE.delete(code);
+
+    return new Response(JSON.stringify({ ok: true }), {
+        headers: {
+            "content-type": "application/json",
             "Set-Cookie": [
-                `gh_token=${tokenJson.access_token}`,
+                `gh_token=${token}`,
                 "HttpOnly",
-                "SameSite=None", // Required for cross-origin cookies
-                "Secure",
+                "SameSite=Lax",
                 "Path=/",
                 "Max-Age=28800",
             ].join("; "),
@@ -69,10 +101,7 @@ async function handleExchange(request, url, env) {
 }
 
 async function handleGitHubProxy(request, url, env) {
-    const cookie = request.headers.get("Cookie") ?? "";
-    const token = cookie.split(";").find(c => c.trim().startsWith("gh_token="))
-        ?.split("=")[1]?.trim();
-
+    const token = getToken(request);
     if (!token) {
         return new Response("Unauthorised", { status: 401, headers: corsHeaders() });
     }
@@ -104,8 +133,8 @@ async function handleLogout(request, url, env) {
     return new Response(null, {
         status: 302,
         headers: {
-            "Location": "http://localhost:5173/VigilCI/",
-            "Set-Cookie": "gh_token=; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=0",
+            "Location": `${ALLOWED_ORIGIN}/VigilCI/`,
+            "Set-Cookie": "gh_token=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0",
             ...corsHeaders(),
         },
     });
