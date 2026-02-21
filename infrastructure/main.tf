@@ -9,6 +9,11 @@ terraform {
 
 provider "cloudflare" {}
 
+resource "cloudflare_workers_kv_namespace" "token_store" {
+  account_id = var.account_id
+  title      = "TOKEN_STORE"
+}
+
 resource "cloudflare_workers_script" "this" {
   account_id         = var.account_id
   script_name        = var.script_name
@@ -27,6 +32,11 @@ resource "cloudflare_workers_script" "this" {
       name = "GITHUB_CLIENT_SECRET"
       type = "secret_text"
       text = var.github_client_secret
+    },
+    {
+      name         = "TOKEN_STORE"
+      type         = "kv_namespace"
+      namespace_id = cloudflare_workers_kv_namespace.token_store.id
     }
   ]
 }
