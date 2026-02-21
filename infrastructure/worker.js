@@ -1,17 +1,34 @@
+const ALLOWED_ORIGIN = "http://localhost:5173";
+
+function corsHeaders() {
+    return {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    };
+}
+
 export default {
     async fetch(request, env) {
         const url = new URL(request.url);
 
+        // Handle CORS preflight
+        if (request.method === "OPTIONS") {
+            return new Response(null, { status: 204, headers: corsHeaders() });
+        }
+
         if (url.pathname === "/exchange") return handleExchange(request, url, env);
+        if (url.pathname === "/logout") return handleLogout(request, url, env);
         if (url.pathname.startsWith("/github/")) return handleGitHubProxy(request, url, env);
 
-        return new Response("Not found", { status: 404 });
+        return new Response("Not found", { status: 404, headers: corsHeaders() });
     },
 };
 
 async function handleExchange(request, url, env) {
     const code = url.searchParams.get("code");
-    if (!code) return new Response("Missing code", { status: 400 });
+    if (!code) return new Response("Missing code", { status: 400, headers: corsHeaders() });
 
     const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
         method: "POST",
@@ -28,7 +45,10 @@ async function handleExchange(request, url, env) {
 
     const tokenJson = await tokenRes.json();
     if (!tokenJson.access_token) {
-        return new Response(JSON.stringify(tokenJson), { status: 400 });
+        return new Response(JSON.stringify(tokenJson), {
+            status: 400,
+            headers: { "content-type": "application/json", ...corsHeaders() }
+        });
     }
 
     return new Response(null, {
@@ -38,11 +58,12 @@ async function handleExchange(request, url, env) {
             "Set-Cookie": [
                 `gh_token=${tokenJson.access_token}`,
                 "HttpOnly",
+                "SameSite=None", // Required for cross-origin cookies
                 "Secure",
-                "SameSite=Strict",
                 "Path=/",
                 "Max-Age=28800",
             ].join("; "),
+            ...corsHeaders(),
         },
     });
 }
@@ -52,7 +73,9 @@ async function handleGitHubProxy(request, url, env) {
     const token = cookie.split(";").find(c => c.trim().startsWith("gh_token="))
         ?.split("=")[1]?.trim();
 
-    if (!token) return new Response("Unauthorised", { status: 401 });
+    if (!token) {
+        return new Response("Unauthorised", { status: 401, headers: corsHeaders() });
+    }
 
     const githubPath = url.pathname.replace(/^\/github/, "");
     const githubUrl = `https://api.github.com${githubPath}${url.search}`;
@@ -72,8 +95,18 @@ async function handleGitHubProxy(request, url, env) {
         status: githubRes.status,
         headers: {
             "content-type": githubRes.headers.get("content-type") ?? "application/json",
-            "Access-Control-Allow-Origin": "http://localhost:5173",
-            "Access-Control-Allow-Credentials": "true",
+            ...corsHeaders(),
+        },
+    });
+}
+
+async function handleLogout(request, url, env) {
+    return new Response(null, {
+        status: 302,
+        headers: {
+            "Location": "http://localhost:5173/VigilCI/",
+            "Set-Cookie": "gh_token=; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=0",
+            ...corsHeaders(),
         },
     });
 }
