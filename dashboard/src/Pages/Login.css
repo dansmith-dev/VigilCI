@@ -1,0 +1,75 @@
+.login-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    background: radial-gradient(circle at center, #f0f4ff 0%, #ffffff 70%);
+.github-link {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #888;
+    transition: color 0.2s;
+}
+
+.github-link:hover {
+    color: #000;
+}
+
+    position: relative;
+}
+
+.logo-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+    font-size: 28px;
+}
+
+.tagline {
+    color: #999;
+    font-size: 15px;
+    margin-bottom: 30px;
+    margin-top: 0;
+    letter-spacing: 0.3px;
+}
+
+#logo {
+    width: 50px;
+}
+
+.divider {
+    width: 75%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e0e0e0 20%, #e0e0e0 80%, transparent);
+}
+
+.login-button {
+    margin-top: 60px;
+    width: 400px;
+    height: 60px;
+    background: #ffffff;
+    border-radius: 5px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e0e0e0;
+}
+
+.login-button:hover {
+    border-color: #000000;
+}
+
+.login-button svg {
+    width: 28px;
+    height: 28px;
+}

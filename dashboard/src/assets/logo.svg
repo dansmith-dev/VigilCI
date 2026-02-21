@@ -1,0 +1,21 @@
+<svg width="300" height="300" viewBox="50 100 300 300" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>Layer 1</title>
+  <rect id="svg_4" height="50" width="50" y="250" x="50" stroke="#000" fill="#000000"/>
+  <rect id="svg_5" height="50" width="50" y="200" x="50" stroke="#000" fill="#000000"/>
+  <rect id="svg_6" height="50" width="50" y="300" x="50" stroke="#000" fill="#000000"/>
+  <rect id="svg_7" height="50" width="50" y="350" x="100" stroke="#000" fill="#000000"/>
+  <rect id="svg_8" height="50" width="50" y="350" x="150" stroke="#000" fill="#000000"/>
+  <rect id="svg_9" height="50" width="50" y="350" x="200" stroke="#000" fill="#000000"/>
+  <rect id="svg_11" height="50" width="50" y="350" x="50" stroke="#000" fill="#000000"/>
+  <rect id="svg_14" height="50" width="50" y="350" x="250" stroke="#000" fill="#000000"/>
+  <rect id="svg_15" height="50" width="50" y="300" x="250" stroke="#000" fill="#000000"/>
+  <rect id="svg_16" height="50" width="50" y="250" x="250" stroke="#000" fill="#000000"/>
+  <rect id="svg_17" height="50" width="50" y="150" x="50" stroke="#000" fill="#000000"/>
+  <rect id="svg_18" height="50" width="50" y="150" x="100" stroke="#000" fill="#000000"/>
+  <rect id="svg_19" height="50" width="50" y="150" x="150" stroke="#000" fill="#000000"/>
+  <rect id="svg_20" height="50" width="50" y="150" x="250" stroke="#000" fill="#000000"/>
+  <rect id="svg_21" height="50" width="50" y="100" x="300" stroke="#000" fill="#000000"/>
+ </g>
+</svg>

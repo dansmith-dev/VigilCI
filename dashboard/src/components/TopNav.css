@@ -1,0 +1,18 @@
+.top-nav {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.top-nav-link {
+    color: #888;
+    transition: color 0.2s;
+    display: flex;
+}
+
+.top-nav-link:hover {
+    color: #000;
+}
