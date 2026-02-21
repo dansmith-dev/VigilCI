@@ -17,11 +17,10 @@ function App() {
     
     function redirectToGitHub() {
         const client_id = "Ov23lixyN6BThSp0tC7U";
-        const redirect_uri = "http://localhost:5173/";
         const scope = "read:user";
 
 
-        const authUrl = `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}`;
+        const authUrl = `https://github.com/login/oauth/authorize?client_id=${client_id}&scope=${scope}`;
 
 
         window.location.href = authUrl;
