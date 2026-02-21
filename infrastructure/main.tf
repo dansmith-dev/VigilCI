@@ -16,6 +16,16 @@ resource "cloudflare_workers_script" "this" {
   content_sha256     = filesha256("${path.module}/worker.js")
   main_module        = "worker.js"
   compatibility_date = "2025-01-01"
+
+  plain_text_binding {
+    name = "GITHUB_CLIENT_ID"
+    text = var.github_client_id
+  }
+
+  secret_text_binding {
+    name = "GITHUB_CLIENT_SECRET"
+    text = var.github_client_secret
+  }
 }
 
 resource "cloudflare_workers_script_subdomain" "this" {
