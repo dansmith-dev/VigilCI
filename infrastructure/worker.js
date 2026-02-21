@@ -1,4 +1,4 @@
-const ALLOWED_ORIGIN = "https://daniel-smith.github.io";
+const ALLOWED_ORIGIN = "http://localhost:5173";
 
 function corsHeaders() {
     return {
