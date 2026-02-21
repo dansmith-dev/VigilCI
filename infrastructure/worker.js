@@ -1,6 +1,8 @@
 export default {
     async fetch(request, env, ctx) {
-        return new Response(request, {
+        const code = request.headers.get("code");
+        
+        return new Response(code, {
             headers: { "content-type": "text/plain" },
         });
     },
