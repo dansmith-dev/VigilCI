@@ -1,8 +1,22 @@
 import './App.css'
+import { useState, useEffect } from "react";
+import { useSearchParams } from 'react-router-dom';
 
 function App() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [code, setCode] = useState();
+
+    useEffect(() => {
+        const urlCode = searchParams.get("code");
+
+        if (urlCode) {
+            console.log(urlCode);
+            setCode(urlCode);
+        }
+    }, [searchParams]);
+    
     function redirectToGitHub() {
-        const client_id = "blah blah";
+        const client_id = "Ov23lixyN6BThSp0tC7U";
         const redirect_uri = "http://localhost:5173/";
         const scope = "read:user";
 
