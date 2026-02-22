@@ -1,18 +1,15 @@
 import './Login.css'
 import logo from '../assets/logo.svg'
 import TopNav from '../components/TopNav'
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'
 
-
 const WORKER_URL = "https://hello-worker.daniel-smith-06a.workers.dev";
-let githubToken = null;
 
 function Login() {
-    const { token, login, logout } = useAuth();
+    const { login } = useAuth();
     const [searchParams] = useSearchParams();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate()
     const hasExchanged = useRef(false);
 
@@ -25,7 +22,6 @@ function Login() {
         fetch(`${WORKER_URL}/exchange?code=${code}`)
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 login(data.token);
                 navigate('/repos', { replace: true });
             });

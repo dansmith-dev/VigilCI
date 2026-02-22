@@ -102,7 +102,7 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
                     colors={colors}
                     lineWidth={2}
                     pointSize={10}
-                    pointColor={{ from: 'serieColor' }}
+                    pointColor={{ from: 'seriesColor' }}
                     pointBorderWidth={2}
                     pointBorderColor="#ffffff"
                     enableArea={false}
@@ -127,8 +127,8 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
                         return (
                             <div className="graph-tooltip">
                                 <div className="graph-tooltip-row">
-                                    <span className="graph-tooltip-swatch" style={{ background: point.serieColor }} />
-                                    <strong>{point.serieId}</strong>
+                                    <span className="graph-tooltip-swatch" style={{ background: (point as any).serieColor ?? (point as any).seriesColor }} />
+                                    <strong>{(point as any).serieId ?? (point as any).seriesId}</strong>
                                     <span>{formatMs(datum.y)}</span>
                                 </div>
                                 <div className="graph-tooltip-meta">{datum.x}</div>
