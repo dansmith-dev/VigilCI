@@ -37,7 +37,50 @@ function formatMs(ms: number): string {
     return `${Math.round(ms)}ms`;
 }
 
+interface TrendSummary {
+    label: string;
+    kind: 'regression' | 'improvement' | 'stable';
+}
+
+function computeTrend(results: VigilResult[]): TrendSummary {
+    const sorted = [...results].sort(
+        (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
+
+    const recent = sorted.slice(-5);
+    if (recent.length < 2) {
+        return { label: `${recent.length} run`, kind: 'stable' };
+    }
+
+    const segName = recent[0].segments.find(s => s.name === 'total')
+        ? 'total'
+        : recent[0].segments[0]?.name;
+
+    if (!segName) return { label: 'No data', kind: 'stable' };
+
+    const first = recent[0].segments.find(s => s.name === segName);
+    const last = recent[recent.length - 1].segments.find(s => s.name === segName);
+    if (!first || !last) return { label: 'Stable', kind: 'stable' };
+
+    const delta = last.averageMs - first.averageMs;
+    const pct = Math.abs(delta) / first.averageMs;
+
+    if (pct < 0.05) {
+        return { label: `Stable over last ${recent.length} runs`, kind: 'stable' };
+    }
+
+    const direction = delta > 0 ? 'regression' : 'improvement';
+    const arrow = delta > 0 ? '\u2191' : '\u2193';
+    const sign = delta > 0 ? '+' : '-';
+    return {
+        label: `${arrow} ${sign}${formatMs(Math.abs(delta))} over last ${recent.length} runs`,
+        kind: direction,
+    };
+}
+
 function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps) {
+    const trend = useMemo(() => computeTrend(results), [results]);
+
     const { allSeries, colorMap } = useMemo(() => {
         const sorted = [...results].sort(
             (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -106,7 +149,12 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
                         AI
                     </button>
                 </div>
-                <span className="build-time-graph-period">{results.length} runs</span>
+                <div className="build-time-graph-header-right">
+                    <span className={`build-time-graph-trend build-time-graph-trend--${trend.kind}`}>
+                        {trend.label}
+                    </span>
+                    <span className="build-time-graph-period">{results.length} runs</span>
+                </div>
             </div>
 
             <div className="build-time-graph-legend">
