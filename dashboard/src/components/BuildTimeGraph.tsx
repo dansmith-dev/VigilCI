@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ResponsiveLine } from '@nivo/line';
 import type { VigilResult } from '../types/vigil';
 import './BuildTimeGraph.css';
@@ -37,7 +37,7 @@ function formatMs(ms: number): string {
 }
 
 function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps) {
-    const { chartData, colors } = useMemo(() => {
+    const { allSeries, colorMap } = useMemo(() => {
         const sorted = [...results].sort(
             (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
@@ -46,7 +46,8 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
         sorted.forEach(r => r.segments.forEach(s => segmentNames.add(s.name)));
 
         const names = Array.from(segmentNames);
-        const seriesColors = names.map((_, i) => SEGMENT_COLORS[i % SEGMENT_COLORS.length]);
+        const cMap = new Map<string, string>();
+        names.forEach((name, i) => cMap.set(name, SEGMENT_COLORS[i % SEGMENT_COLORS.length]));
 
         const series = names.map(segName => ({
             id: segName,
@@ -63,8 +64,20 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
                 }),
         }));
 
-        return { chartData: series, colors: seriesColors };
+        return { allSeries: series, colorMap: cMap };
     }, [results]);
+
+    const [activeSegment, setActiveSegment] = useState<string | null>(null);
+
+    function handleLegendClick(segName: string) {
+        setActiveSegment(prev => prev === segName ? null : segName);
+    }
+
+    const visibleData = activeSegment
+        ? allSeries.filter(s => s.id === activeSegment)
+        : allSeries;
+
+    const visibleColors = visibleData.map(s => colorMap.get(s.id)!);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function handlePointClick(point: any) {
@@ -82,24 +95,42 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
             </div>
 
             <div className="build-time-graph-legend">
-                {chartData.map((series, i) => (
-                    <span key={series.id} className="build-time-graph-legend-item">
-                        <span className="legend-swatch" style={{ background: colors[i] }} />
-                        {series.id}
-                    </span>
-                ))}
+                {allSeries.map(series => {
+                    const color = colorMap.get(series.id)!;
+                    const isActive = activeSegment === null || activeSegment === series.id;
+                    return (
+                        <button
+                            key={series.id}
+                            className={`build-time-graph-legend-item ${isActive ? '' : 'build-time-graph-legend-item--dimmed'}`}
+                            onClick={() => handleLegendClick(series.id)}
+                            type="button"
+                        >
+                            <span className="legend-swatch" style={{ background: isActive ? color : '#d0d7de' }} />
+                            {series.id}
+                        </button>
+                    );
+                })}
+                {activeSegment && (
+                    <button
+                        className="build-time-graph-legend-reset"
+                        onClick={() => setActiveSegment(null)}
+                        type="button"
+                    >
+                        Show all
+                    </button>
+                )}
             </div>
 
             <p className="build-time-graph-hint">Click a data point to view the commit</p>
 
             <div className="build-time-graph-chart">
                 <ResponsiveLine
-                    data={chartData}
+                    data={visibleData}
                     margin={{ top: 12, right: 24, bottom: 60, left: 72 }}
                     xScale={{ type: 'point' }}
                     yScale={{ type: 'linear', min: 0, max: 'auto', stacked: false }}
                     curve="monotoneX"
-                    colors={colors}
+                    colors={visibleColors}
                     lineWidth={2}
                     pointSize={10}
                     pointColor={{ from: 'seriesColor' }}
