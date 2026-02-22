@@ -1,33 +1,38 @@
 import './Login.css'
 import logo from '../assets/logo.svg'
 import TopNav from '../components/TopNav'
-import { useState, useEffect } from "react";
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'
+
 
 const WORKER_URL = "https://hello-worker.daniel-smith-06a.workers.dev";
 let githubToken = null;
 
 function Login() {
+    const { token, login, logout } = useAuth();
     const [searchParams] = useSearchParams();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const navigate = useNavigate()
+    const hasExchanged = useRef(false);
 
     useEffect(() => {
         const code = searchParams.get("code");
-        if (!code) return;
+        if (!code || hasExchanged.current) return;
+
+        hasExchanged.current = true;
 
         fetch(`${WORKER_URL}/exchange?code=${code}`)
             .then(res => res.json())
             .then(data => {
-                if (data.token) {
-                    githubToken = data.token;
-                    setIsAuthenticated(true);
-                    window.history.replaceState({}, "", window.location.pathname);
-                }
+                console.log(data);
+                login(data.token);
+                navigate('/repos', { replace: true });
             });
     }, []);
 
     function loginWithGitHub() {
-        const authUrl = `https://github.com/login/oauth/authorize?client_id=Ov23lixyN6BThSp0tC7U&scope=read:user,gist`;
+        const authUrl = `https://github.com/login/oauth/authorize?client_id=Ov23lixyN6BThSp0tC7U&scope=read:user,gist,repo`;
         window.location.href = authUrl;
     }
 
