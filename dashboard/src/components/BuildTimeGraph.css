@@ -1,0 +1,117 @@
+.build-time-graph {
+    border-top: 1px solid #d0d7de;
+    padding: 20px;
+}
+
+.build-time-graph + .build-time-graph {
+    border-top: 1px dashed #d0d7de;
+}
+
+.build-time-graph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.build-time-graph-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2328;
+}
+
+.build-time-graph-period {
+    font-size: 12px;
+    color: #656d76;
+}
+
+.build-time-graph-legend {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.build-time-graph-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #656d76;
+}
+
+.legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.build-time-graph-hint {
+    margin: 0 0 8px;
+    font-size: 11px;
+    color: #8b949e;
+}
+
+.build-time-graph-chart {
+    height: 280px;
+    cursor: pointer;
+}
+
+/* Tooltip */
+
+.graph-tooltip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: #1f2328;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
+    min-width: 140px;
+}
+
+.graph-tooltip-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.graph-tooltip-row strong {
+    font-weight: 600;
+}
+
+.graph-tooltip-row span:last-child {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+}
+
+.graph-tooltip-swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.graph-tooltip-meta {
+    font-size: 11px;
+    color: #8b949e;
+}
+
+.graph-tooltip-commit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #79c0ff;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    margin-top: 2px;
+}
+
+.graph-tooltip-commit svg {
+    flex-shrink: 0;
+}
