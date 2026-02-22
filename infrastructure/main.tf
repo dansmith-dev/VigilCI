@@ -27,6 +27,10 @@ resource "cloudflare_workers_script" "this" {
       name = "GITHUB_CLIENT_SECRET"
       type = "secret_text"
       text = var.github_client_secret
+    },
+    {
+      name = "AI"
+      type = "ai"
     }
   ]
 }

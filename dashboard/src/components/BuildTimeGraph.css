@@ -14,11 +14,42 @@
     margin-bottom: 4px;
 }
 
+.build-time-graph-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .build-time-graph-header h3 {
     margin: 0;
     font-size: 14px;
     font-weight: 600;
     color: #1f2328;
+}
+
+.ai-analyze-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: inherit;
+    color: #9a6700;
+    background: #fff8c5;
+    border: 1px solid #d4a72c;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ai-analyze-btn:hover {
+    background: #f5e077;
+    border-color: #9a6700;
+}
+
+.ai-analyze-btn svg {
+    flex-shrink: 0;
 }
 
 .build-time-graph-period {

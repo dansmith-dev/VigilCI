@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ResponsiveLine } from '@nivo/line';
+import AiSummaryModal from './AiSummaryModal';
 import type { VigilResult } from '../types/vigil';
 import './BuildTimeGraph.css';
 
@@ -68,6 +69,7 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
     }, [results]);
 
     const [activeSegment, setActiveSegment] = useState<string | null>(null);
+    const [showAiModal, setShowAiModal] = useState(false);
 
     function handleLegendClick(segName: string) {
         setActiveSegment(prev => prev === segName ? null : segName);
@@ -90,7 +92,20 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
     return (
         <div className="build-time-graph">
             <div className="build-time-graph-header">
-                <h3>{testName}</h3>
+                <div className="build-time-graph-header-left">
+                    <h3>{testName}</h3>
+                    <button
+                        className="ai-analyze-btn"
+                        onClick={() => setShowAiModal(true)}
+                        type="button"
+                        title="AI Analysis"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                        </svg>
+                        AI
+                    </button>
+                </div>
                 <span className="build-time-graph-period">{results.length} runs</span>
             </div>
 
@@ -176,6 +191,15 @@ function BuildTimeGraph({ testName, results, repoFullName }: BuildTimeGraphProps
                     }}
                 />
             </div>
+
+            {showAiModal && (
+                <AiSummaryModal
+                    testName={testName}
+                    results={results}
+                    repoFullName={repoFullName}
+                    onClose={() => setShowAiModal(false)}
+                />
+            )}
         </div>
     );
 }
