@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
 import type { VigilResult } from '../types/vigil';
 import './AiSummaryModal.css';
@@ -102,10 +102,96 @@ async function fetchCommitDetails(
     }
 }
 
+function formatInline(text: string, repoFullName: string, commitMap: Map<string, string>): ReactNode[] {
+    const parts: ReactNode[] = [];
+    const pattern = /(\*\*(.+?)\*\*)|(\b[0-9a-f]{7,40}\b)/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = pattern.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+            parts.push(text.slice(lastIndex, match.index));
+        }
+
+        if (match[1]) {
+            const boldContent = match[2];
+            const innerNodes = formatInline(boldContent, repoFullName, commitMap);
+            parts.push(<strong key={match.index}>{innerNodes}</strong>);
+        } else if (match[3]) {
+            const sha = match[3];
+            const fullSha = [...commitMap.entries()].find(([full]) => full.startsWith(sha))?.[0];
+            if (fullSha) {
+                parts.push(
+                    <a
+                        key={match.index}
+                        className="ai-modal-commit-link"
+                        href={`https://github.com/${repoFullName}/commit/${fullSha}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {sha.slice(0, 7)}
+                    </a>
+                );
+            } else {
+                parts.push(sha);
+            }
+        }
+
+        lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+        parts.push(text.slice(lastIndex));
+    }
+
+    return parts;
+}
+
+function renderAnalysis(text: string, repoFullName: string, commitMap: Map<string, string>): ReactNode {
+    const lines = text.split('\n');
+    const elements: ReactNode[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        if (!line) {
+            elements.push(<div key={i} className="ai-modal-spacer" />);
+            continue;
+        }
+
+        const sectionMatch = line.match(/^\d+\.\s*(REGRESSION CAUSES|PATTERNS|SUGGESTIONS|[A-Z][A-Z\s]{3,})$/);
+        if (sectionMatch) {
+            elements.push(
+                <h4 key={i} className="ai-modal-section-title">{sectionMatch[1]}</h4>
+            );
+            continue;
+        }
+
+        const listMatch = line.match(/^[-\u2022\d]+[.)]\s*/);
+        if (listMatch) {
+            const content = line.slice(listMatch[0].length);
+            elements.push(
+                <div key={i} className="ai-modal-list-item">
+                    <span className="ai-modal-list-bullet">{listMatch[0].trim()}</span>
+                    <span>{formatInline(content, repoFullName, commitMap)}</span>
+                </div>
+            );
+            continue;
+        }
+
+        elements.push(
+            <p key={i} className="ai-modal-line">{formatInline(line, repoFullName, commitMap)}</p>
+        );
+    }
+
+    return <>{elements}</>;
+}
+
 function AiSummaryModal({ testName, results, repoFullName, onClose }: AiSummaryModalProps) {
     const { token } = useAuth();
     const [status, setStatus] = useState<'loading' | 'done' | 'error'>('loading');
     const [analysis, setAnalysis] = useState('');
+    const [commitMap, setCommitMap] = useState<Map<string, string>>(new Map());
     const [step, setStep] = useState('Detecting regressions...');
 
     const runAnalysis = useCallback(async () => {
@@ -132,6 +218,12 @@ function AiSummaryModal({ testName, results, repoFullName, onClose }: AiSummaryM
                 const details = commitDetails.get(r.commit)!;
                 return { ...r, message: details.message, diff: details.diff };
             });
+
+            const shaMap = new Map<string, string>();
+            for (const r of results) {
+                shaMap.set(r.commit, r.commit);
+            }
+            setCommitMap(shaMap);
 
             setStep('Analyzing with AI...');
             const timeline = buildTimeline(results);
@@ -188,9 +280,7 @@ function AiSummaryModal({ testName, results, repoFullName, onClose }: AiSummaryM
 
                     {status === 'done' && (
                         <div className="ai-modal-result">
-                            {analysis.split('\n').map((line, i) => (
-                                <p key={i}>{line || '\u00A0'}</p>
-                            ))}
+                            {renderAnalysis(analysis, repoFullName, commitMap)}
                         </div>
                     )}
 

@@ -100,12 +100,60 @@
 
 .ai-modal-result {
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.65;
     color: #1f2328;
 }
 
-.ai-modal-result p {
+.ai-modal-line {
     margin: 0 0 6px;
+}
+
+.ai-modal-spacer {
+    height: 8px;
+}
+
+.ai-modal-section-title {
+    margin: 16px 0 8px;
+    padding-bottom: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #656d76;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #d0d7de;
+}
+
+.ai-modal-section-title:first-child {
+    margin-top: 0;
+}
+
+.ai-modal-list-item {
+    display: flex;
+    gap: 6px;
+    margin: 0 0 6px;
+}
+
+.ai-modal-list-bullet {
+    flex-shrink: 0;
+    color: #656d76;
+    min-width: 18px;
+}
+
+.ai-modal-commit-link {
+    display: inline;
+    padding: 1px 5px;
+    font-size: 12px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    color: #0969da;
+    background: #ddf4ff;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.ai-modal-commit-link:hover {
+    background: #b6e3ff;
+    text-decoration: underline;
 }
 
 /* Error */

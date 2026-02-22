@@ -93,22 +93,33 @@ async function handleAnalyze(request, env) {
         })
         .join("\n\n");
 
+    const commitShas = regressions.map((r) => r.commit.slice(0, 7));
     const prompt = `You are a performance analysis assistant for CI test results. Be concise and specific.
 
-    Test: "${testName}"
-    
-    Timeline (chronological):
-    ${timelineText}
-    
-    Commits that introduced slowdowns:
-    ${regressionsText}
-    
-    Provide a brief analysis:
-    1. Which changes most likely caused each regression and why
-    2. Patterns in the code that explain the slowdown
-    3. Specific suggestions for improvement
-    
-    Keep the response under 300 words. Use plain text, not markdown.`;
+Test: "${testName}"
+
+Timeline (chronological):
+${timelineText}
+
+Commits that introduced slowdowns:
+${regressionsText}
+
+Provide a brief analysis with these three sections:
+
+1. REGRESSION CAUSES
+For each regression, explain which changes caused it and why. Always refer to commits by their short hash (e.g. ${commitShas[0] || "abc1234"}).
+
+2. PATTERNS
+What patterns in the code explain the slowdowns.
+
+3. SUGGESTIONS
+Specific actionable suggestions for improvement.
+
+Rules:
+- Keep the response under 300 words.
+- Use numbered lists within each section.
+- Do NOT use markdown formatting like ** or #. Use plain text only.
+- Always reference commits by their 7-character short hash.`;
 
     try {
         const aiResponse = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
