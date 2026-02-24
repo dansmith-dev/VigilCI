@@ -24,45 +24,15 @@ function SetupBanner({ onDismiss }: SetupBannerProps) {
                 </button>
             </div>
             <p className="setup-banner-description">
-                No VigilCI results gist was found. Follow these steps to start tracking performance in your .NET projects:
+                No VigilCI results gist was found. To start tracking performance in your .NET projects, follow the setup guide.
             </p>
-            <ol className="setup-banner-steps">
-                <li>
-                    <strong>Install the NuGet package</strong> in your test project:
-                    <code>dotnet add package VigilCI.Core</code>
-                </li>
-                <li>
-                    <strong>Add a performance test</strong> using the <code>[PerformanceTest]</code> attribute:
-                    <pre>{`[PerformanceTest(runs: 5)]
-                        public void MyTest()
-                        {
-                            using (PerfTimer.Measure("work"))
-                            {
-                                // code to measure
-                            }
-                        }`}
-                    </pre>
-                </li>
-                <li>
-                    <strong>Create a GitHub Personal Access Token</strong> with the <code>gist</code> scope at{' '}
-                    <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer">
-                        github.com/settings/tokens
-                    </a>
-                </li>
-                <li>
-                    <strong>Add the token</strong> as a repository secret named <code>VIGILCI_GITHUB_TOKEN</code> in your repo's Settings &gt; Secrets &gt; Actions
-                </li>
-                <li>
-                    <strong>Run your tests</strong> — VigilCI automatically creates a gist and publishes results. On the first run it will print the gist ID; save it as a <code>VIGILCI_GIST_ID</code> secret for subsequent runs.
-                </li>
-            </ol>
             <a
                 className="setup-banner-link"
-                href="https://github.com/dansmith-dev/VigilCI"
+                href="https://github.com/dansmith-dev/VigilCI#quick-start"
                 target="_blank"
                 rel="noopener noreferrer"
             >
-                View full setup guide on GitHub →
+                View setup guide on GitHub →
             </a>
         </div>
     );
