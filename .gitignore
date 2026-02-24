@@ -16,9 +16,9 @@ packages/
 # Sensitive local config
 launchSettings.json
 
-# Environment variables
-.env
-.env.*
+# Environment variable overrides
+.env.local
+.env.*.local
 
 # OS
 .DS_Store
