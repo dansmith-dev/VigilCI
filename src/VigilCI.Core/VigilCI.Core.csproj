@@ -13,6 +13,9 @@
         <Description>Core library for VigilCI — continuous performance test tracking</Description>
         <PackageTags>performance;testing;benchmarking;ci</PackageTags>
         <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/dansmith-dev/VigilCI</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/dansmith-dev/VigilCI</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
@@ -24,6 +27,7 @@
 
     <ItemGroup>
         <None Include="buildTransitive\VigilCI.Core.targets" Pack="true" PackagePath="buildTransitive\" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>

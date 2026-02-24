@@ -50,11 +50,49 @@ That's it. The test runs 5 times, measures each segment, and computes averages.
 dotnet test
 ```
 
-Or run directly as an executable (xUnit v3 projects are standalone executables):
+### 4. Publish results to a GitHub Gist (optional)
+
+Set a GitHub token with the `gist` scope and run your tests — VigilCI creates a gist automatically on the first run:
 
 ```bash
-dotnet run --project MyTests
+# PowerShell
+$env:VIGILCI_GITHUB_TOKEN = "ghp_your_token_here"
+dotnet test
+
+# Bash
+VIGILCI_GITHUB_TOKEN=ghp_your_token_here dotnet test
 ```
+
+The first run creates a new private gist and prints the ID:
+
+```
+[VigilCI] Created new gist: a1b2c3d4e5f6
+[VigilCI] Set VIGILCI_GIST_ID=a1b2c3d4e5f6 in your CI secrets to reuse it.
+```
+
+Set the gist ID on subsequent runs to append to the same gist:
+
+```bash
+# PowerShell
+$env:VIGILCI_GIST_ID = "a1b2c3d4e5f6"
+
+# Bash
+export VIGILCI_GIST_ID=a1b2c3d4e5f6
+```
+
+See [CI Integration](#ci-integration) for full setup with GitHub Actions.
+
+### 5. View trends in the dashboard
+
+Open the [VigilCI Dashboard](https://dansmith-dev.github.io/VigilCI/), sign in with GitHub, and connect your gist to visualize performance trends over time.
+
+Track performance across commits with interactive graphs — click any data point to jump to the commit:
+
+![Dashboard showing performance trends per repository](docs/images/dashboard-repos.png)
+
+Regressions are detected automatically. Click the AI button to get an analysis of what caused the slowdown, powered by Cloudflare Workers AI:
+
+![AI analysis modal explaining regression causes and suggestions](docs/images/dashboard-ai-analysis.png)
 
 ## How It Works
 

@@ -16,6 +16,10 @@ packages/
 # Sensitive local config
 launchSettings.json
 
+# Environment variables
+.env
+.env.*
+
 # OS
 .DS_Store
 Thumbs.db

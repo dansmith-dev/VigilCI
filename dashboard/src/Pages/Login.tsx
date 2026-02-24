@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'
 
-const WORKER_URL = "https://hello-worker.daniel-smith-06a.workers.dev";
+const WORKER_URL = import.meta.env.VITE_WORKER_URL;
 
 function Login() {
     const { login } = useAuth();
@@ -28,7 +28,8 @@ function Login() {
     }, []);
 
     function loginWithGitHub() {
-        const authUrl = `https://github.com/login/oauth/authorize?client_id=Ov23lixyN6BThSp0tC7U&scope=read:user,gist,repo`;
+        const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+        const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=read:user,gist,repo`;
         window.location.href = authUrl;
     }
 

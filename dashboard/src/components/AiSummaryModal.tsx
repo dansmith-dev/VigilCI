@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import type { VigilResult } from '../types/vigil';
 import './AiSummaryModal.css';
 
-const WORKER_URL = "https://hello-worker.daniel-smith-06a.workers.dev";
+const WORKER_URL = import.meta.env.VITE_WORKER_URL;
 
 interface AiSummaryModalProps {
     testName: string;
