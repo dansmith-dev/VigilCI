@@ -34,10 +34,6 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: dashboard
-        env:
-          VITE_GIST_ID: ${{ secrets.VIGILCI_GIST_ID }}
-          VITE_WORKER_URL: ${{ secrets.VITE_WORKER_URL }}
-          VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

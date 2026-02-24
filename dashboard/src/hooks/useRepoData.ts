@@ -20,19 +20,24 @@ async function fetchRepos(token: string, bustCache: boolean): Promise<Repo[]> {
     return res.json();
 }
 
-async function fetchVigilResults(token: string, bustCache: boolean): Promise<VigilResult[]> {
+interface VigilFetchResult {
+    results: VigilResult[];
+    gistFound: boolean;
+}
+
+async function fetchVigilResults(token: string, bustCache: boolean): Promise<VigilFetchResult> {
     const res = await githubFetch(
         'https://api.github.com/gists?per_page=100',
         token,
         bustCache,
     );
-    if (!res.ok) return [];
+    if (!res.ok) return { results: [], gistFound: false };
 
     const gists = await res.json();
     const vigilGist = gists.find(
         (g: { files: Record<string, unknown> }) => g.files['vigilci-results.json']
     );
-    if (!vigilGist) return [];
+    if (!vigilGist) return { results: [], gistFound: false };
 
     const gistFile = vigilGist.files['vigilci-results.json'] as {
         content?: string;
@@ -41,7 +46,7 @@ async function fetchVigilResults(token: string, bustCache: boolean): Promise<Vig
     };
 
     if (gistFile.content && !gistFile.truncated) {
-        return JSON.parse(gistFile.content);
+        return { results: JSON.parse(gistFile.content), gistFound: true };
     }
 
     const dataRes = await githubFetch(
@@ -49,17 +54,18 @@ async function fetchVigilResults(token: string, bustCache: boolean): Promise<Vig
         token,
         bustCache,
     );
-    if (!dataRes.ok) return [];
+    if (!dataRes.ok) return { results: [], gistFound: true };
 
     const fullGist = await dataRes.json();
     const fullContent = fullGist.files['vigilci-results.json']?.content;
-    return fullContent ? JSON.parse(fullContent) : [];
+    return { results: fullContent ? JSON.parse(fullContent) : [], gistFound: true };
 }
 
 export function useRepoData() {
     const { token } = useAuth();
     const [repos, setRepos] = useState<Repo[]>([]);
     const [vigilResults, setVigilResults] = useState<VigilResult[]>([]);
+    const [hasGist, setHasGist] = useState(true);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -80,7 +86,8 @@ export function useRepoData() {
                 fetchVigilResults(token, isRefresh),
             ]);
             setRepos(repoData);
-            setVigilResults(vigilData);
+            setVigilResults(vigilData.results);
+            setHasGist(vigilData.gistFound);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Something went wrong');
         } finally {
@@ -104,5 +111,5 @@ export function useRepoData() {
         return map;
     }, [vigilResults]);
 
-    return { repos, resultsByRepo, loading, refreshing, error, refresh };
+    return { repos, resultsByRepo, hasGist, loading, refreshing, error, refresh };
 }

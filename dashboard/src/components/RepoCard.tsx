@@ -100,7 +100,14 @@ function RepoCard({ name, fullName, description, language, stars, isPrivate, upd
                     ))
                 ) : (
                     <div className="repo-card-empty">
-                        No VigilCI results found for this repository.
+                        <p>No VigilCI results found for this repository.</p>
+                        <p>
+                            Add <code>[PerformanceTest]</code> to your test methods and set
+                            the <code>VIGILCI_GITHUB_TOKEN</code> environment variable to start tracking.{' '}
+                            <a href="https://github.com/dansmith-dev/VigilCI#quick-start" target="_blank" rel="noopener noreferrer">
+                                Learn more →
+                            </a>
+                        </p>
                     </div>
                 )
             )}

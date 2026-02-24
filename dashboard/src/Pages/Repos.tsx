@@ -6,12 +6,14 @@ import PageHeader from '../components/PageHeader';
 import SearchBar from '../components/SearchBar';
 import Spinner from '../components/Spinner';
 import RepoCard from '../components/RepoCard';
+import SetupBanner from '../components/SetupBanner';
 import './Repos.css';
 
 function Repos() {
     const { logout } = useAuth();
-    const { repos, resultsByRepo, loading, refreshing, error, refresh } = useRepoData();
+    const { repos, resultsByRepo, hasGist, loading, refreshing, error, refresh } = useRepoData();
     const [search, setSearch] = useState('');
+    const [bannerDismissed, setBannerDismissed] = useState(false);
 
     const filtered = useMemo(() => {
         if (!search.trim()) return repos;
@@ -58,6 +60,10 @@ function Repos() {
                     ]}
                 />
                 <SearchBar value={search} onChange={setSearch} />
+
+                {!hasGist && !bannerDismissed && (
+                    <SetupBanner onDismiss={() => setBannerDismissed(true)} />
+                )}
 
                 {filtered.length === 0 ? (
                     <div className="repos-empty">
