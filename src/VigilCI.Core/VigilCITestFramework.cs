@@ -26,8 +26,9 @@ internal sealed class VigilCiExecutor(IXunitTestAssembly assembly) : XunitTestFr
         if (results.Count == 0) return;
 
         var token = Environment.GetEnvironmentVariable("VIGILCI_GITHUB_TOKEN");
+        if (string.IsNullOrEmpty(token)) return;
+
         var gistId = Environment.GetEnvironmentVariable("VIGILCI_GIST_ID");
-        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(gistId)) return;
 
         try
         {
