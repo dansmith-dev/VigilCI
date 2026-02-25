@@ -11,7 +11,17 @@ Track test performance trends directly in CI. VigilCI is a performance testing f
 - **Auto gist creation** — no need to create a gist manually; one is created on first run
 - **[Dashboard](https://dansmith-dev.github.io/VigilCI/)** — a web app to visualize performance trends over time
 
+![Dashboard showing performance trends per repository](docs/images/dashboard-repos.png)
+
+![AI analysis modal explaining regression causes and suggestions](docs/images/dashboard-ai-analysis.png)
+
 ## Quick Start
+
+### Prerequisites
+
+- A **.NET 8.0+** test project using **xUnit v3**
+- A **GitHub repository** with your project pushed (VigilCI reads the git remote to associate results with your repo)
+- A **GitHub Personal Access Token** with the **`gist`** scope — [create one here](https://github.com/settings/tokens)
 
 ### 1. Install the package
 
@@ -19,7 +29,19 @@ Track test performance trends directly in CI. VigilCI is a performance testing f
 dotnet add package VigilCI.Core
 ```
 
-### 2. Write a performance test
+### 2. Set your GitHub token
+
+VigilCI needs a token to publish results to a gist. Set it as an environment variable before running tests:
+
+```bash
+# PowerShell
+$env:VIGILCI_GITHUB_TOKEN = "ghp_your_token_here"
+
+# Bash
+export VIGILCI_GITHUB_TOKEN=ghp_your_token_here
+```
+
+### 3. Write a performance test
 
 ```csharp
 using VigilCI.Core;
@@ -42,42 +64,19 @@ public class MyTests
 }
 ```
 
-That's it. The test runs 5 times, measures each segment, and computes averages.
-
-### 3. Run your tests
+### 4. Run your tests
 
 ```bash
 dotnet test
 ```
 
-### 4. Publish results to a GitHub Gist (optional)
+VigilCI runs the test 5 times, measures each segment, computes averages, and publishes the results to a GitHub Gist. It automatically finds your existing gist (by looking for one containing `vigilci-results.json`), or creates a new private gist on the first run. Subsequent runs append to the same gist — no extra configuration needed.
 
-Set a GitHub token with the `gist` scope and run your tests — VigilCI creates a gist automatically on the first run:
-
-```bash
-# PowerShell
-$env:VIGILCI_GITHUB_TOKEN = "ghp_your_token_here"
-dotnet test
-
-# Bash
-VIGILCI_GITHUB_TOKEN=ghp_your_token_here dotnet test
-```
-
-VigilCI automatically finds your existing gist (by looking for one containing `vigilci-results.json`). If none exists, it creates a new private gist. Subsequent runs append to the same gist — no extra configuration needed.
-
-See [CI Integration](#ci-integration) for full setup with GitHub Actions.
+See [CI Integration](#ci-integration) for setting this up in GitHub Actions.
 
 ### 5. View trends in the dashboard
 
-Open the [VigilCI Dashboard](https://dansmith-dev.github.io/VigilCI/), sign in with GitHub, and connect your gist to visualize performance trends over time.
-
-Track performance across commits with interactive graphs — click any data point to jump to the commit:
-
-![Dashboard showing performance trends per repository](docs/images/dashboard-repos.png)
-
-Regressions are detected automatically. Click the AI button to get an analysis of what caused the slowdown, powered by Cloudflare Workers AI:
-
-![AI analysis modal explaining regression causes and suggestions](docs/images/dashboard-ai-analysis.png)
+Open the [VigilCI Dashboard](https://dansmith-dev.github.io/VigilCI/), sign in with GitHub, and your repositories with VigilCI results will appear automatically.
 
 ## How It Works
 
