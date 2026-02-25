@@ -63,22 +63,7 @@ dotnet test
 VIGILCI_GITHUB_TOKEN=ghp_your_token_here dotnet test
 ```
 
-The first run creates a new private gist and prints the ID:
-
-```
-[VigilCI] Created new gist: a1b2c3d4e5f6
-[VigilCI] Set VIGILCI_GIST_ID=a1b2c3d4e5f6 in your CI secrets to reuse it.
-```
-
-Set the gist ID on subsequent runs to append to the same gist:
-
-```bash
-# PowerShell
-$env:VIGILCI_GIST_ID = "a1b2c3d4e5f6"
-
-# Bash
-export VIGILCI_GIST_ID=a1b2c3d4e5f6
-```
+VigilCI automatically finds your existing gist (by looking for one containing `vigilci-results.json`). If none exists, it creates a new private gist. Subsequent runs append to the same gist — no extra configuration needed.
 
 See [CI Integration](#ci-integration) for full setup with GitHub Actions.
 
@@ -148,9 +133,9 @@ VigilCI automatically publishes results to a GitHub Gist when the right environm
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `VIGILCI_GITHUB_TOKEN` | Yes | A GitHub Personal Access Token (PAT) with the **`gist`** scope. Used to authenticate with the GitHub API for creating and updating gists. |
-| `VIGILCI_GIST_ID` | No | The ID of an existing gist to append results to. If omitted, VigilCI creates a new private gist on the first run and prints the ID to the console. |
+| `VIGILCI_GIST_ID` | No | Explicit gist ID to skip the automatic lookup. If omitted, VigilCI searches your gists for one containing `vigilci-results.json` and uses it. If none exists, a new private gist is created. |
 
-Both variables are read at runtime by the custom test framework executor. If `VIGILCI_GITHUB_TOKEN` is not set, publishing is skipped entirely and tests behave like normal xUnit tests.
+Only `VIGILCI_GITHUB_TOKEN` is needed. If it's not set, publishing is skipped entirely and tests behave like normal xUnit tests.
 
 ### Step-by-Step Setup
 
@@ -200,32 +185,14 @@ jobs:
       - name: Run performance tests
         env:
           VIGILCI_GITHUB_TOKEN: ${{ secrets.VIGILCI_GITHUB_TOKEN }}
-          VIGILCI_GIST_ID: ${{ secrets.VIGILCI_GIST_ID }}
         run: dotnet test
 ```
 
-The `env` block passes your secrets as environment variables to the `dotnet test` process. VigilCI picks them up automatically — no code changes needed.
+The `env` block passes your token as an environment variable to the `dotnet test` process. VigilCI picks it up automatically — no code changes needed.
 
-#### 4. First run — auto gist creation
+#### 4. Push and run
 
-Push a commit or open a pull request to trigger the workflow. On the first run `VIGILCI_GIST_ID` won't be set, so VigilCI creates a new private gist and prints the ID in the workflow logs:
-
-```
-[VigilCI] Created new gist: a1b2c3d4e5f6
-[VigilCI] Set VIGILCI_GIST_ID=a1b2c3d4e5f6 in your CI secrets to reuse it.
-```
-
-#### 5. Save the gist ID
-
-1. Open the workflow run in **Actions** and find the gist ID in the logs
-2. Go back to **Settings** > **Secrets and variables** > **Actions**
-3. Click **New repository secret**
-4. Add a secret with:
-   - **Name:** `VIGILCI_GIST_ID`
-   - **Value:** the gist ID from the logs (e.g. `a1b2c3d4e5f6`)
-5. Click **Add secret**
-
-From this point on, every CI run appends new results to the same gist. The dashboard can then read this gist to display performance trends over time.
+Push a commit or open a pull request to trigger the workflow. VigilCI will automatically find or create a gist and publish results. Every subsequent run appends to the same gist. The dashboard can then read this gist to display performance trends over time.
 
 ### Local Development
 

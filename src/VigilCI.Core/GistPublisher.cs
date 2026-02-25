@@ -6,6 +6,8 @@ namespace VigilCI.Core;
 
 public static class GistPublisher
 {
+    private const string ResultsFileName = "vigilci-results.json";
+
     private static readonly HttpClient Http = CreateClient();
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -14,27 +16,52 @@ public static class GistPublisher
         WriteIndented = true
     };
 
-    public static async Task<string> PublishAsync(
+    public static async Task PublishAsync(
         IReadOnlyCollection<PerformanceResult> results,
         string token,
         string? gistId = null,
         CancellationToken ct = default)
     {
         if (string.IsNullOrEmpty(gistId))
+            gistId = await FindExistingGistAsync(token, ct);
+
+        if (gistId is not null)
         {
-            gistId = await CreateGistAsync(token, results, ct);
-            Console.WriteLine($"[VigilCI] Created new gist: {gistId}");
-            Console.WriteLine($"[VigilCI] Set VIGILCI_GIST_ID={gistId} in your CI secrets to reuse it.");
-            return gistId;
+            var existing = await FetchExistingResultsAsync(token, gistId, ct);
+            existing.AddRange(results);
+            await PatchGistAsync(token, gistId, existing, ct);
+            return;
         }
 
-        var existing = await FetchExistingResultsAsync(token, gistId, ct);
-        existing.AddRange(results);
-        await PatchGistAsync(token, gistId, existing, ct);
-        return gistId;
+        await CreateGistAsync(token, results, ct);
     }
 
-    private static async Task<string> CreateGistAsync(
+    private static async Task<string?> FindExistingGistAsync(string token, CancellationToken ct)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/gists?per_page=100");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        using var response = await Http.SendAsync(request, ct);
+        if (!response.IsSuccessStatusCode) return null;
+
+        var body = await response.Content.ReadAsStringAsync(ct);
+        var gists = JsonSerializer.Deserialize<JsonElement>(body, JsonOptions);
+
+        if (gists.ValueKind != JsonValueKind.Array) return null;
+
+        foreach (var gist in gists.EnumerateArray())
+        {
+            if (gist.TryGetProperty("files", out var files) &&
+                files.TryGetProperty(ResultsFileName, out _))
+            {
+                return gist.GetProperty("id").GetString();
+            }
+        }
+
+        return null;
+    }
+
+    private static async Task CreateGistAsync(
         string token,
         IReadOnlyCollection<PerformanceResult> results,
         CancellationToken ct)
@@ -45,7 +72,7 @@ public static class GistPublisher
             Public = false,
             Files = new Dictionary<string, object>
             {
-                ["vigilci-results.json"] = new
+                [ResultsFileName] = new
                 {
                     Content = JsonSerializer.Serialize(results, JsonOptions)
                 }
@@ -59,10 +86,6 @@ public static class GistPublisher
 
         using var response = await Http.SendAsync(request, ct);
         response.EnsureSuccessStatusCode();
-
-        var body = await response.Content.ReadAsStringAsync(ct);
-        var gist = JsonSerializer.Deserialize<JsonElement>(body, JsonOptions);
-        return gist.GetProperty("id").GetString()!;
     }
 
     private static async Task<List<PerformanceResult>> FetchExistingResultsAsync(
@@ -81,7 +104,7 @@ public static class GistPublisher
         var gist = JsonSerializer.Deserialize<JsonElement>(gistJson, JsonOptions);
 
         if (gist.TryGetProperty("files", out var files) &&
-            files.TryGetProperty("vigilci-results.json", out var file) &&
+            files.TryGetProperty(ResultsFileName, out var file) &&
             file.TryGetProperty("content", out var content))
         {
             var existing = JsonSerializer.Deserialize<List<PerformanceResult>>(
@@ -104,7 +127,7 @@ public static class GistPublisher
         {
             Files = new Dictionary<string, object>
             {
-                ["vigilci-results.json"] = new
+                [ResultsFileName] = new
                 {
                     Content = JsonSerializer.Serialize(results, JsonOptions)
                 }

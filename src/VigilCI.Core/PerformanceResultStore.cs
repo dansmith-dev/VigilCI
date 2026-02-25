@@ -28,9 +28,9 @@ public static class PerformanceResultStore
             TestName: testName,
             FullyQualifiedName: fullyQualifiedName,
             Timestamp: DateTimeOffset.UtcNow,
-            Commit: Environment.GetEnvironmentVariable("GITHUB_SHA") ?? "local",
-            Branch: Environment.GetEnvironmentVariable("GITHUB_REF_NAME") ?? "local",
-            Repository: Environment.GetEnvironmentVariable("GITHUB_REPOSITORY") ?? "local",
+            Commit: GitInfo.Commit,
+            Branch: GitInfo.Branch,
+            Repository: GitInfo.Repository,
             Runs: runs,
             Segments: context.GetAverages());
 
