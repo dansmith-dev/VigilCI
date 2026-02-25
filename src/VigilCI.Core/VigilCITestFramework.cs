@@ -32,7 +32,7 @@ internal sealed class VigilCiExecutor(IXunitTestAssembly assembly) : XunitTestFr
 
         try
         {
-            await GistPublisher.PublishAsync(results, token, gistId);
+            await GistPublisher.PublishAsync(results, token, gistId, cancellationToken);
         }
         catch (Exception ex)
         {

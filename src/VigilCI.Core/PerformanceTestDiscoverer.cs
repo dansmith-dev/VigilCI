@@ -3,7 +3,7 @@ using Xunit.v3;
 
 namespace VigilCI.Core;
 
-public class PerformanceTestDiscoverer : IXunitTestCaseDiscoverer
+internal class PerformanceTestDiscoverer : IXunitTestCaseDiscoverer
 {
     public ValueTask<IReadOnlyCollection<IXunitTestCase>> Discover(
         ITestFrameworkDiscoveryOptions discoveryOptions,

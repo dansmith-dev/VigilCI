@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace VigilCI.Core;
 
-public static class GistPublisher
+internal static class GistPublisher
 {
     private const string ResultsFileName = "vigilci-results.json";
 
@@ -44,19 +44,23 @@ public static class GistPublisher
         using var response = await Http.SendAsync(request, ct);
         if (!response.IsSuccessStatusCode) return null;
 
-        var body = await response.Content.ReadAsStringAsync(ct);
-        var gists = JsonSerializer.Deserialize<JsonElement>(body, JsonOptions);
-
-        if (gists.ValueKind != JsonValueKind.Array) return null;
-
-        foreach (var gist in gists.EnumerateArray())
+        try
         {
-            if (gist.TryGetProperty("files", out var files) &&
-                files.TryGetProperty(ResultsFileName, out _))
+            var body = await response.Content.ReadAsStringAsync(ct);
+            var gists = JsonSerializer.Deserialize<JsonElement>(body, JsonOptions);
+
+            if (gists.ValueKind != JsonValueKind.Array) return null;
+
+            foreach (var gist in gists.EnumerateArray())
             {
-                return gist.GetProperty("id").GetString();
+                if (gist.TryGetProperty("files", out var files) &&
+                    files.TryGetProperty(ResultsFileName, out _))
+                {
+                    return gist.GetProperty("id").GetString();
+                }
             }
         }
+        catch (JsonException) { }
 
         return null;
     }
@@ -100,19 +104,25 @@ public static class GistPublisher
         using var response = await Http.SendAsync(request, ct);
         response.EnsureSuccessStatusCode();
 
-        var gistJson = await response.Content.ReadAsStringAsync(ct);
-        var gist = JsonSerializer.Deserialize<JsonElement>(gistJson, JsonOptions);
-
-        if (gist.TryGetProperty("files", out var files) &&
-            files.TryGetProperty(ResultsFileName, out var file) &&
-            file.TryGetProperty("content", out var content))
+        try
         {
-            var existing = JsonSerializer.Deserialize<List<PerformanceResult>>(
-                content.GetString()!, JsonOptions);
+            var gistJson = await response.Content.ReadAsStringAsync(ct);
+            var gist = JsonSerializer.Deserialize<JsonElement>(gistJson, JsonOptions);
 
-            if (existing is not null)
-                return existing;
+            if (gist.TryGetProperty("files", out var files) &&
+                files.TryGetProperty(ResultsFileName, out var file) &&
+                file.TryGetProperty("content", out var content))
+            {
+                var contentStr = content.GetString();
+                if (contentStr is not null)
+                {
+                    var existing = JsonSerializer.Deserialize<List<PerformanceResult>>(contentStr, JsonOptions);
+                    if (existing is not null)
+                        return existing;
+                }
+            }
         }
+        catch (JsonException) { }
 
         return new List<PerformanceResult>();
     }

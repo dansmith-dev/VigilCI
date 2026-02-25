@@ -69,6 +69,9 @@ public class PerformanceTestCase : XunitTestCase, ISelfExecutingXunitTestCase
 
         for (int i = 0; i < Runs; i++)
         {
+            if (cancellationTokenSource.IsCancellationRequested)
+                break;
+
             PerformanceContext.BeginRun(i);
 
             var isFirstRun = i == 0;

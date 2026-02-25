@@ -1,6 +1,6 @@
 namespace VigilCI.Core;
 
-public class TestTimingContext
+internal class TestTimingContext
 {
     private readonly int _totalRuns;
     private readonly List<List<TimingSegment>> _allRuns = new();

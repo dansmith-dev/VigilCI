@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace VigilCI.Core;
 
-public class TimingSegment : IDisposable
+internal class TimingSegment : IDisposable
 {
     private readonly Stopwatch? _sw;
 
